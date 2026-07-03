@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopEase | Capstone Project</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f4f4f4;
+}
+
+header{
+background:#111;
+color:white;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+nav a{
+color:white;
+text-decoration:none;
+margin:15px;
+font-weight:bold;
+}
+
+nav a:hover{
+color:orange;
+}
+
+.hero{
+padding:60px;
+text-align:center;
+background:linear-gradient(120deg,#4facfe,#00f2fe);
+color:white;
+}
+
+.hero h1{
+font-size:45px;
+}
+
+input{
+padding:10px;
+width:300px;
+margin-top:20px;
+}
+
+.container{
+padding:30px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 5px 10px rgba(0,0,0,.1);
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-8px);
+}
+
+.card img{
+width:100%;
+height:200px;
+object-fit:cover;
+}
+
+button{
+background:#111;
+color:white;
+border:none;
+padding:10px 20px;
+margin-top:10px;
+cursor:pointer;
+}
+
+button:hover{
+background:orange;
+}
+
+footer{
+background:#111;
+color:white;
+text-align:center;
+padding:20px;
+margin-top:30px;
+}
+
+.page{
+display:none;
+}
+
+.active{
+display:block;
+}
+
+.cart{
+font-size:20px;
+font-weight:bold;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+
+<h2>ShopEase</h2>
+
+<nav>
+
+<a href="#" onclick="showPage('home')">Home</a>
+
+<a href="#" onclick="showPage('products')">Products</a>
+
+<a href="#" onclick="showPage('about')">About</a>
+
+<a href="#" onclick="showPage('contact')">Contact</a>
+
+</nav>
+
+<div class="cart">
+🛒 <span id="count">0</span>
+</div>
+
+</header>
+
+<div id="home" class="page active">
+
+<section class="hero">
+
+<h1>Modern E-Commerce Store</h1>
+
+<p>Professional Full Stack Capstone Project</p>
+
+<input
+type="text"
+placeholder="Search Products..."
+onkeyup="search(this.value)">
+
+</section>
+
+<div class="container" id="productsContainer"></div>
+
+</div>
+
+<div id="products" class="page">
+
+<h1 style="padding:30px;">All Products</h1>
+
+<div class="container" id="productList"></div>
+
+</div>
+
+<div id="about" class="page">
+
+<div style="padding:40px">
+
+<h1>About</h1>
+
+<br>
+
+<p>
+
+This project demonstrates:
+
+</p>
+
+<br>
+
+<ul>
+
+<li>Responsive Design</li>
+
+<li>Client-side Routing</li>
+
+<li>JavaScript State Management</li>
+
+<li>Performance Optimization</li>
+
+<li>Deployment Ready</li>
+
+</ul>
+
+</div>
+
+</div>
+
+<div id="contact" class="page">
+
+<div style="padding:40px">
+
+<h1>Contact</h1>
+
+<br>
+
+<p>Email: student@example.com</p>
+
+<p>Phone: +91 9876543210</p>
+
+</div>
+
+</div>
+
+<footer>
+
+Full Stack Deployment Capstone Project ©2026
+
+</footer>
+
+<script>
+
+let cart=0;
+
+const products=[
+
+{
+name:"Laptop",
+price:"₹65000",
+image:"https://picsum.photos/300?1"
+},
+
+{
+name:"Smartphone",
+price:"₹25000",
+image:"https://picsum.photos/300?2"
+},
+
+{
+name:"Headphones",
+price:"₹3000",
+image:"https://picsum.photos/300?3"
+},
+
+{
+name:"Shoes",
+price:"₹2000",
+image:"https://picsum.photos/300?4"
+},
+
+{
+name:"Watch",
+price:"₹4000",
+image:"https://picsum.photos/300?5"
+},
+
+{
+name:"Camera",
+price:"₹45000",
+image:"https://picsum.photos/300?6"
+}
+
+];
+
+function display(data,id){
+
+let html="";
+
+data.forEach(p=>{
+
+html+=`
+
+<div class="card">
+
+<img loading="lazy" src="${p.image}">
+
+<h2>${p.name}</h2>
+
+<h3>${p.price}</h3>
+
+<button onclick="addCart()">Add To Cart</button>
+
+</div>
+
+`;
+
+});
+
+document.getElementById(id).innerHTML=html;
+
+}
+
+display(products,"productsContainer");
+
+display(products,"productList");
+
+function addCart(){
+
+cart++;
+
+document.getElementById("count").innerHTML=cart;
+
+}
+
+function search(text){
+
+let result=products.filter(x=>
+
+x.name.toLowerCase().includes(text.toLowerCase())
+
+);
+
+display(result,"productsContainer");
+
+}
+
+function showPage(id){
+
+document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+
+document.getElementById(id).classList.add("active");
+
+}
+
+</script>
+
+</body>
+</html>
