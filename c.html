@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript To-Do List App</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f4f4f4;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+.container{
+    width:90%;
+    max-width:600px;
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.input-box{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+input{
+    flex:1;
+    padding:10px;
+    font-size:16px;
+}
+
+button{
+    padding:10px 15px;
+    border:none;
+    cursor:pointer;
+    border-radius:5px;
+}
+
+#addBtn{
+    background:#007bff;
+    color:white;
+}
+
+.filters{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.filters button{
+    margin:5px;
+    background:#555;
+    color:white;
+}
+
+ul{
+    list-style:none;
+}
+
+li{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px;
+    margin-bottom:10px;
+    background:#f8f8f8;
+    border-radius:6px;
+}
+
+.task-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.completed span{
+    text-decoration:line-through;
+    color:gray;
+}
+
+.actions button{
+    margin-left:5px;
+}
+
+.edit{
+    background:orange;
+    color:white;
+}
+
+.delete{
+    background:red;
+    color:white;
+}
+
+.footer{
+    margin-top:20px;
+    text-align:center;
+    font-weight:bold;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>To-Do List</h1>
+
+<div class="input-box">
+<input type="text" id="taskInput" placeholder="Enter a task">
+<button id="addBtn">Add</button>
+</div>
+
+<div class="filters">
+<button data-filter="all">All</button>
+<button data-filter="active">Active</button>
+<button data-filter="completed">Completed</button>
+</div>
+
+<ul id="taskList"></ul>
+
+<div class="footer">
+<span id="count">0</span> Task(s)
+</div>
+
+</div>
+
+<script>
+
+const taskInput=document.getElementById("taskInput");
+const addBtn=document.getElementById("addBtn");
+const taskList=document.getElementById("taskList");
+const filters=document.querySelector(".filters");
+const count=document.getElementById("count");
+
+let tasks=JSON.parse(localStorage.getItem("tasks"))||[];
+
+let filter="all";
+
+render();
+
+addBtn.addEventListener("click",addTask);
+
+taskInput.addEventListener("keypress",function(e){
+    if(e.key==="Enter"){
+        addTask();
+    }
+});
+
+filters.addEventListener("click",function(e){
+
+    if(e.target.tagName==="BUTTON"){
+        filter=e.target.dataset.filter;
+        render();
+    }
+
+});
+
+taskList.addEventListener("click",function(e){
+
+    const li=e.target.closest("li");
+
+    if(!li) return;
+
+    const id=Number(li.dataset.id);
+
+    if(e.target.classList.contains("delete")){
+        deleteTask(id);
+    }
+
+    if(e.target.classList.contains("edit")){
+        editTask(id);
+    }
+
+    if(e.target.classList.contains("toggle")){
+        toggleTask(id);
+    }
+
+});
+
+function addTask(){
+
+    const text=taskInput.value.trim();
+
+    if(text===""){
+        alert("Enter a task");
+        return;
+    }
+
+    tasks.push({
+        id:Date.now(),
+        text:text,
+        completed:false
+    });
+
+    save();
+
+    taskInput.value="";
+
+    render();
+
+}
+
+function render(){
+
+    taskList.innerHTML="";
+
+    let filtered=tasks;
+
+    if(filter==="active"){
+        filtered=tasks.filter(task=>!task.completed);
+    }
+
+    if(filter==="completed"){
+        filtered=tasks.filter(task=>task.completed);
+    }
+
+    filtered.forEach(task=>{
+
+        const li=document.createElement("li");
+
+        li.dataset.id=task.id;
+
+        if(task.completed){
+            li.classList.add("completed");
+        }
+
+        li.innerHTML=`
+
+        <div class="task-left">
+
+        <input type="checkbox"
+        class="toggle"
+        ${task.completed?"checked":""}>
+
+        <span>${task.text}</span>
+
+        </div>
+
+        <div class="actions">
+
+        <button class="edit">Edit</button>
+
+        <button class="delete">Delete</button>
+
+        </div>
+
+        `;
+
+        taskList.appendChild(li);
+
+    });
+
+    count.innerText=tasks.length;
+
+}
+
+function toggleTask(id){
+
+    tasks.forEach(task=>{
+
+        if(task.id===id){
+
+            task.completed=!task.completed;
+
+        }
+
+    });
+
+    save();
+
+    render();
+
+}
+
+function editTask(id){
+
+    const task=tasks.find(task=>task.id===id);
+
+    const newTask=prompt("Edit Task",task.text);
+
+    if(newTask===null) return;
+
+    if(newTask.trim()===""){
+        alert("Task cannot be empty");
+        return;
+    }
+
+    task.text=newTask.trim();
+
+    save();
+
+    render();
+
+}
+
+function deleteTask(id){
+
+    if(confirm("Delete this task?")){
+
+        tasks=tasks.filter(task=>task.id!==id);
+
+        save();
+
+        render();
+
+    }
+
+}
+
+function save(){
+
+    localStorage.setItem("tasks",JSON.stringify(tasks));
+
+}
+
+</script>
+
+</body>
+</html>
